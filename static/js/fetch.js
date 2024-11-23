@@ -48,9 +48,77 @@ document.getElementById('y').addEventListener('change', (ev) => {
 document.querySelectorAll('input[name="r"]').forEach((radio) => {
     radio.addEventListener('change', (ev) => {
         state.r = parseInt(ev.target.value);
-		updateShapes();
+        updateShapes();
     });
 });
+
+
+const resultsPerPage = 5; // Количество результатов на странице
+let results = []; // Массив для хранения данных
+let currentPage = 1; // Текущая страница
+
+
+// Функция для рендеринга таблицы
+function renderTable() {
+    const tableBody = document.getElementById('result');
+    tableBody.innerHTML = ''; // Очистить таблицу перед рендерингом
+
+    // Рассчитать диапазон записей для текущей страницы
+    const startIndex = (currentPage - 1) * resultsPerPage;
+    const endIndex = Math.min(startIndex + resultsPerPage, results.length);
+
+    // Отобразить записи для текущей страницы
+    for (let i = startIndex; i < endIndex; i++) {
+        const row = document.createElement('tr');
+
+        const xCell = document.createElement('td');
+        xCell.textContent = results[i].x;
+        row.appendChild(xCell);
+
+        const yCell = document.createElement('td');
+        yCell.textContent = results[i].y;
+        row.appendChild(yCell);
+
+        const rCell = document.createElement('td');
+        rCell.textContent = results[i].r;
+        row.appendChild(rCell);
+
+        const hitCell = document.createElement('td');
+        hitCell.textContent = results[i].hit;
+        row.appendChild(hitCell);
+
+        const timeCell = document.createElement('td');
+        timeCell.textContent = results[i].CurTime;
+        row.appendChild(timeCell);
+
+        const scriptTimeCell = document.createElement('td');
+        scriptTimeCell.textContent = results[i].ExecutionTime;
+        row.appendChild(scriptTimeCell);
+
+        tableBody.appendChild(row);
+    }
+
+    updatePaginationControls();
+}
+
+// Функция для обновления кнопок пагинации
+function updatePaginationControls() {
+    const paginationControls = document.getElementById('pagination-controls');
+    paginationControls.innerHTML = ''; // Очистить перед обновлением
+
+    const totalPages = Math.ceil(results.length / resultsPerPage);
+
+    for (let i = 1; i <= totalPages; i++) {
+        const button = document.createElement('button');
+        button.textContent = i;
+        button.disabled = i === currentPage; // Заблокировать текущую страницу
+        button.addEventListener('click', () => {
+            currentPage = i;
+            renderTable();
+        });
+        paginationControls.appendChild(button);
+    }
+}
 
 document.getElementById('data-form').addEventListener('submit', async function (ev) {
     ev.preventDefault();
@@ -63,19 +131,12 @@ document.getElementById('data-form').addEventListener('submit', async function (
 
     const table = document.getElementById('result');
 
-    const newRow = table.insertRow(-1);
-
-    const rowX = newRow.insertCell(0);
-    const rowY = newRow.insertCell(1);
-    const rowR = newRow.insertCell(2);
-    const rowResult = newRow.insertCell(3);
-
-    const rowCurTime = newRow.insertCell(4);
-    const rowExecutionTime = newRow.insertCell(5);
-
-    rowX.innerText = state.x;
-    rowY.innerText = state.y;
-    rowR.innerText = state.r;
+    const x = state.x;
+    const y = state.y;
+    const r = state.r;
+    let CurTime = '?';
+    let hit = '?';
+    let ExecutionTime = '?';
 
     const params = new URLSearchParams(state);
 
@@ -84,15 +145,14 @@ document.getElementById('data-form').addEventListener('submit', async function (
     if (response.ok) {
         const result = await response.json();
 
-        rowResult.textContent = result.result.toString();
         if (result.result) {
-            rowResult.textContent = 'Попал';
+            hit = 'Попал';
         } else {
-            rowResult.textContent = 'Промазал'
+            hit = 'Промазал';
         }
 
-        rowCurTime.textContent = result.currentTime.toString();
-        rowExecutionTime.textContent = (result.executionTimeMs / 1_000_000_000).toString();
+        CurTime = result.currentTime.toString();
+        ExecutionTime = (result.executionTimeMs / 1_000_000_000).toString();
     } else if (response.status === 400) {
         const result = await response.json();
         rowResult.textContent = `error: ${result.reason}`;
@@ -101,6 +161,22 @@ document.getElementById('data-form').addEventListener('submit', async function (
         rowResult.textContent = `error: ${response.statusText}`;
         console.error(response.status + " " + response.statusText);
     }
+
+    results.unshift({
+        x: x,
+        y: y,
+        r: r,
+        hit: hit,
+        CurTime: CurTime,
+        ExecutionTime: ExecutionTime,
+    });
+
+    renderTable();
+});
+
+// Первичная инициализация
+document.addEventListener('DOMContentLoaded', () => {
+    renderTable();
 });
 
 
@@ -130,13 +206,13 @@ function updateShapes() {
 
 window.onload = function() { /* this func matches figure to selected Radius after refreshing page */
     // Получаем текущее значение r из поля ввода
-	document.querySelectorAll('input[name="r"]').forEach((radio) => {
-		radio.addEventListener('change', (ev) => {
-			state.r = parseInt(ev.target.value);
-			updateShapes();
-		});
-	});
-	
+    document.querySelectorAll('input[name="r"]').forEach((radio) => {
+        radio.addEventListener('change', (ev) => {
+            state.r = parseInt(ev.target.value);
+            updateShapes();
+        });
+    });
+
     // Добавим такие же слушатели на X и Y
     document.getElementById('x').addEventListener('change', (ev) => {
         state.x = parseInt(ev.target.value);
