@@ -1,0 +1,49 @@
+plugins {
+    id 'java'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+tasks.withType(JavaCompile) {
+    sourceCompatibility = '17'
+    targetCompatibility = '17'
+}
+tasks.withType(Jar) {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+
+group = 'org'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation files('./libs/fcgi-lib.jar')
+    implementation 'org.apache.logging.log4j:log4j-core:2.24.0'
+    implementation 'org.apache.logging.log4j:log4j-api:2.24.0'
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'org.Main'
+        )
+    }
+    from {
+        configurations.runtimeClasspath.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+    archiveFileName = 'web_lab1.jar'
+}
+
+test {
+    useJUnitPlatform()
+}

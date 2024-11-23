@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лабораторная работа № 1 по дисциплине "Веб-программирование"</title>
+	<style>
+		html, body {
+			height: 100%;
+			margin: 0;
+		}
+
+		body { /* наследование и каскадирование */
+			font-family: "Arial", sans-serif; /* это свойство перейдём всем элементам страницы - наследование */
+			padding: 0; /* задаём внутренние отступы для всех элементов страницы */
+			background-color: whitesmoke;
+			background-size: cover;
+
+			/* Строчки ниже необходимы, чтобы footer всегда располагался в самом низу страницы (даже когда содержимого страницы не хватает) */
+			display: grid;
+			grid-template-rows: auto 1fr auto;
+		}
+
+		input, select, button { /* каскадирование */
+			padding: 4px 6px; /* padding уже задан в body, но для input, select и button применится указанный здесь padding – каскадирование */
+		}
+
+
+		table {
+			width: 100%; /* ширина для табличек */
+			border-collapse: collapse; /* Убирает промежутки между ячейками */
+		}
+		#main-content td {
+			border: 2px solid #555555;
+			text-align: center;
+		}
+		#header-container { /* идентификатор */
+			font-family: monospace;
+			background-color: #555555;
+
+			color: #ffffff;
+			padding: 20px;
+			text-align: center;
+		}
+		.ans-header {
+			color: #f31043;
+		}
+		.author-info {
+			padding: 15px
+		}
+		.info {
+			background-color: lightblue;
+			padding: 20px;
+			/*text-align: center;*/
+		}
+
+		input::placeholder { /* псевдоэлемент */
+			color: gray;
+			font-style: italic;
+		}
+
+		button[type="submit"] { /* атрибут + псевдокласс */
+			background-color: rgba(19, 33, 40, 0.9); /* Цвет фона */
+			color: white; /* Цвет текста */
+			padding: 10px 20px; /* Отступы */
+			font-size: 16px; /* Размер шрифта */
+			border: none; /* Убрать границу */
+			border-radius: 5px; /* Закруглённые углы */
+			cursor: pointer; /* Иконка курсора при наведении */
+			box-shadow: 1px 4px 6px rgba(0, 0, 0, 0.2); /* Тень */
+			transition: background-color 0.3s ease; /* Плавный переход */
+		}
+
+		button[type="submit"]:hover { /* атрибут + псевдокласс */
+			background-color: #e31043; /* Цвет при наведении */
+		}
+
+		button[type="submit"]:active { /* атрибут + псевдокласс */
+			background-color: #871c3a; /* Цвет при клике */
+			box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); /* Тень при клике */
+		}
+
+		button[type="submit"]:disabled { /* атрибут + псевдокласс */
+			background-color: #cccccc; /* Цвет для отключённой кнопки */
+			cursor: not-allowed; /* Иконка при отключении */
+		}
+
+		.result-table {
+			margin: 25px 0; /* Отступы вокруг таблицы */
+			font-size: 18px; /* Размер шрифта */
+			font-family: 'Arial', sans-serif; /* Шрифт */
+			width: 100%; /* Ширина таблицы */
+			text-align: center; /* Выравнивание текста по центру */
+			border: 1px solid #ddd; /* Граница таблицы */
+		}
+
+		.result-table thead tr {
+			background-color: rgba(155, 155, 155, 0.89); /* Цвет фона заголовка */
+			color: #7CFC00; /* Цвет текста заголовка */
+			text-align: center; /* Выравнивание текста заголовка */
+			font-weight: bold; /* Полужирный текст */
+		}
+
+		.result-table tbody tr {
+			background-color: #ffffff; /* Цвет фона для строк тела таблицы */
+			color: #555555; /* Цвет текста для строк тела таблицы */
+		}
+
+		.result-table th, .result-table td {
+			padding: 12px 15px; /* Внутренние отступы для ячеек */
+			border-bottom: 1px solid rgba(19, 33, 40, 0.89); /* Границы ячеек */
+		}
+
+		/* Чередующийся цвет строк в теле таблицы */
+		.result-table tbody tr:nth-of-type(even) {
+			background-color: #f2f2f2; /* Цвет для чётных строк */
+		}
+
+		.result-table tbody tr:nth-of-type(odd) {
+			background-color: #ffffff; /* Цвет для нечётных строк */
+		}
+
+		.result-table tbody tr:hover {
+			background-color: rgba(19, 33, 40, 0.1); /* Цвет при наведении на строку */
+		}
+
+		footer {
+			background-color: rgba(19, 33, 40, 0.89);
+			color: #ffffff; /* Цвет текста */
+			padding: 1px; /* Внутренние отступы */
+			text-align: left; /* Центрирование текста */
+			position: relative;
+			bottom: 0;
+			width: 100%; /* Растягиваем footer на всю ширину */
+			box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.2); /* Тень для визуального эффекта */
+			font-size: 14px; /* Размер шрифта */
+			font-family: 'Arial', sans-serif; /* Шрифт */
+		}
+
+		footer a {
+			color: #7CFC00; /* Цвет ссылок */
+			text-decoration: none; /* Убираем подчеркивание */
+			font-weight: bold; /* Полужирный текст для ссылок */
+		}
+
+		footer a:hover {
+			color: #e31043; /* Изменение цвета при наведении */
+		}
+
+		.footer-content {
+			max-width: 1200px; /* Ограничиваем ширину контента */
+			margin: 0 auto; /* Центрируем контент */
+		}
+	</style>
+</head>
+<body>
+
+<header id="header-container">
+    <h1 class="header-title">Лабораторная работа <span class="ans-header">№1</span></h1>
+    <h2 class="author-info">ФИО: <span  class="ans-header">Прокофьев Арсений Александрович</span>, Группа: <span  class="ans-header">P3313</span>, Вариант: <span  class="ans-header">367502</span></h2>
+</header>
+
+<!-- Input Form and Graph -->
+<table id="main-content" >
+    <tr>
+        <!-- Input form -->
+        <td>
+            <form method="get" action="/" id="data-form">
+                <label for="x">Select X:</label>
+                <select id="x" name="x" required>
+                    <option value="-5">-5</option>
+                    <option value="-4">-4</option>
+                    <option value="-3">-3</option>
+                    <option value="-2">-2</option>
+                    <option value="-1">-1</option>
+                    <option value="0" selected>0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                </select>
+                <p></p>
+
+                <label for="y2">Enter Y:</label>
+                <input type="text" placeholder="enter a number from -3 to 3" value="0" id="y" name="y" required>
+
+                <section id="errorY" hidden></section>
+                <p></p>
+
+                <label for="r">Select R:</label>
+				<input type="radio" id="r1" name="r" value="1" checked>
+				<label for="r1">1</label>
+				<input type="radio" id="r2" name="r" value="2">
+				<label for="r2">2</label>
+				<input type="radio" id="r3" name="r" value="3">
+				<label for="r3">3</label>
+				<input type="radio" id="r4" name="r" value="4">
+				<label for="r4">4</label>
+				<input type="radio" id="r5" name="r" value="5">
+				<label for="r5">5</label>
+                <p></p>
+
+                <button type="submit" class="styled-button">Submit</button>
+            </form>
+        </td>
+
+        <!-- Right column with graph -->
+        <td>
+<!--            <canvas id="graph" width="400" height="400"></canvas>-->
+            <svg xmlns="http://www.w3.org/2000/svg" id="svg" width="300" height="300">
+                <!-- triangle-->
+                <polygon id="triangle" points="150,150 210,150 150,90" fill="#555555" fill-opacity="0.6"></polygon>
+
+                <!-- square-->
+                <rect id="square" x="150" y="126" width="120" height="120" fill="#555555" fill-opacity="0.6"></rect>
+                <!-- circle-->
+                <path id="quarterCircle" d="M 150 150 L 30 150 C 30 80 80 30 150 30 Z" fill="#555555" fill-opacity="0.6"></path>
+
+                <!--X line-->
+                <line x1="0" y1="150" x2="300" y2="150" stroke="#555555"></line>
+                <!--Y line-->
+                <line x1="150" y1="0" x2="150" y2="300" stroke="#555555"></line>
+
+                <line x1="126" y1="148" x2="126" y2="152" stroke="#555555"></line> <!-- -1 point on x -->
+                <line x1="174" y1="148" x2="174" y2="152" stroke="#555555"></line> <!-- 1 point on x -->
+                <text x="121" y="140">-1</text> <!-- '-1' on x -->
+                <text x="169" y="140">1</text> <!-- '1' on x -->
+				
+				<line x1="102" y1="148" x2="102" y2="152" stroke="#555555"></line> <!-- -2 point on x -->
+                <line x1="198" y1="148" x2="198" y2="152" stroke="#555555"></line> <!-- 2 point on x -->
+                <text x="97" y="140">-2</text> <!-- '-2' on x -->
+                <text x="193" y="140">2</text> <!-- '2' on x -->
+
+                <line x1="78" y1="148" x2="78" y2="152" stroke="#555555"></line> <!-- -3 point on x -->
+                <line x1="222" y1="148" x2="222" y2="152" stroke="#555555"></line> <!-- 3 point on x -->
+                <text x="73" y="140">-3</text> <!-- '-3' on x -->
+                <text x="217" y="140">3</text> <!-- '3' on x -->
+
+                <line x1="54" y1="148" x2="54" y2="152" stroke="#555555"></line> <!-- -4 point on x -->
+                <line x1="246" y1="148" x2="246" y2="152" stroke="#555555"></line> <!-- 4 point on x -->
+                <text x="49" y="140">-4</text> <!-- '-4' on x -->
+                <text x="241" y="140">4</text> <!-- '4' on x -->
+
+                <line x1="30" y1="148" x2="30" y2="152" stroke="#555555"></line> <!-- -5 point on x -->
+                <line x1="270" y1="148" x2="270" y2="152" stroke="#555555"></line> <!-- 5 point on x -->
+                <text x="25" y="140">-5</text> <!-- '-5' on x -->
+                <text x="265" y="140">5</text> <!-- '5' on x -->
+
+				
+				<line x1="148" y1="126" x2="152" y2="126" stroke="#555555"></line> <!-- 1 on y -->
+                <line x1="148" y1="174" x2="152" y2="174" stroke="#555555"></line> <!-- -1 on y -->
+                <text x="156" y="131">1</text> <!-- 1 on y -->
+                <text x="156" y="179">-1</text> <!-- -1 on y -->
+
+				<line x1="148" y1="102" x2="152" y2="102" stroke="#555555"></line> <!-- 2 on y -->
+                <line x1="148" y1="198" x2="152" y2="198" stroke="#555555"></line> <!-- -2 on y -->
+                <text x="156" y="107">2</text> <!-- 2 on y -->
+                <text x="156" y="203">-2</text> <!-- -2 on y -->
+				
+				<line x1="148" y1="78" x2="152" y2="78" stroke="#555555"></line> <!-- 3 on y -->
+                <line x1="148" y1="222" x2="152" y2="222" stroke="#555555"></line> <!-- -3 on y -->
+                <text x="156" y="83">3</text> <!-- 3 on y -->
+                <text x="156" y="227">-3</text> <!-- -3 on y -->
+
+                <line x1="148" y1="54" x2="152" y2="54" stroke="#555555"></line> <!-- 4 on y -->
+                <line x1="148" y1="246" x2="152" y2="246" stroke="#555555"></line> <!-- -4 on y -->
+                <text x="156" y="59">4</text> <!-- 4 on y -->
+                <text x="156" y="251">-4</text> <!-- -4 on y -->
+
+                <line x1="148" y1="30" x2="152" y2="30" stroke="#555555"></line> <!-- 5 on y -->
+                <line x1="148" y1="270" x2="152" y2="270" stroke="#555555"></line> <!-- -5 on y -->
+                <text x="156" y="35">5</text> <!-- 5 on y -->
+                <text x="156" y="275">-5</text> <!-- -5 on y -->
+
+                <polygon points="300,150 295,155 295, 145" fill="#000720" stroke="#000720"></polygon>
+                <polygon points="150,0 145,5 155,5" fill="#000720" stroke="#000720"></polygon>
+
+
+                <!-- Point-->
+                <circle id="pointer" r="5" cx="150" cy="150" fill-opacity="0.9" fill="red" stroke="firebrick"
+                        visibility="hidden"></circle>
+            </svg>
+        </td>
+    </tr>
+</table>
+
+<!-- Result Table -->
+<table class="result-table" id="result-table">
+    <!--    <table id="result-table">-->
+    <thead>
+    <tr>
+        <th>X</th>
+        <th>Y</th>
+        <th>R</th>
+        <th>Попадание</th>
+        <th>Время запроса</th>
+        <th>Время работы скрипта (в с)</th>
+    </tr>
+    </thead>
+    <tbody id="result">
+    <!-- Previous shots will be saved here -->
+    </tbody>
+</table>
+
+<footer>
+    <section id="footer-content">
+        <p>© </p>
+        <p>Some text</p>
+    </section>
+</footer>
+
+<script type="text/javascript" src="js/fetch.js"></script>
+</body>
+</html>
