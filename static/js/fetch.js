@@ -124,7 +124,6 @@ document.getElementById('data-form').addEventListener('submit', async function (
     ev.preventDefault();
 
     if (!validateState()) {
-        alert('Sorry, you are not able to submit your variables. Some of them are invalid.')
         return;
     }
 

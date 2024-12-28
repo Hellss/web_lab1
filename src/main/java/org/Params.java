@@ -48,12 +48,16 @@ public class Params {
         }
 
         var y = params.get("y");
-        if (y == null || y.isEmpty()) {
+
+        if (y == null || y.isEmpty() || y.length() > 8) {
             throw new ValidationException("y is invalid");
         }
 
         try {
             var yy = Float.parseFloat(y);
+            if (Float.isNaN(yy)) {
+                throw new NumberFormatException();
+            }
             if (yy < -3 || yy > 3) {
                 throw new ValidationException("y has forbidden value");
             }
